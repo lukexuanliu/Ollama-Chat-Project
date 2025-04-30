@@ -4,7 +4,23 @@ A simple no-frills chat application using Ollama's **qwen3:0.6b** model, built u
 
 ## Local Setup
 
-This application is designed to work with Ollama running locally on your Mac. The model (`qwen3:0.6b`) is downloaded and run directly on your machine, providing fast and private AI interactions without relying on external cloud services.
+To get started with Ollama on your Mac, follow these official setup steps:
+
+1. Install Ollama:
+   - Visit the official Ollama website: [https://ollama.ai/download](https://ollama.ai/download)
+   - Follow the installation instructions for macOS
+   - Start the Ollama daemon with `ollama serve`
+
+2. Pull the qwen3:0.6b model:
+   ```bash
+   ollama pull qwen3:0.6b
+   ```
+
+3. Verify installation:
+   - Check if the model is available: `ollama list`
+   - Test the model: `ollama run qwen3:0.6b "Hello!"`
+
+For detailed setup instructions and troubleshooting, visit the official Ollama documentation: [https://ollama.ai/docs](https://ollama.ai/docs)
 
 ## CORS Handling
 
