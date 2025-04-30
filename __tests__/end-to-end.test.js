@@ -92,23 +92,52 @@ describe('LLM End-to-End Tests', () => {
       "What other colors do you like?"
     ];
 
+    const conversationHistory = [];
+    
     for (const message of messages) {
-      console.log(`Sending conversation history message: ${message}`);
+      console.log(`\nSending message: ${message}`);
       const response = await axios.post(API_URL, { message });
       expect(response.status).toBe(200);
       expect(response.data.main).toBeTruthy();
+      
+      // Store the response for later verification
+      conversationHistory.push({
+        message,
+        response: response.data.main
+      });
+      
+      console.log('Response:', response.data.main);
       await setTimeout(500);
     }
 
     // Send a question that should reference previous conversation
-    console.log('Sending final question about colors');
-    const response = await axios.post(API_URL, {
+    console.log('\nSending follow-up question about colors');
+    const finalResponse = await axios.post(API_URL, {
       message: "What colors did we discuss earlier?"
     });
 
-    expect(response.status).toBe(200);
-    expect(response.data.main).toBeTruthy();
+    console.log('Final response:', finalResponse.data.main);
+    expect(finalResponse.status).toBe(200);
+    expect(finalResponse.data.main).toBeTruthy();
+    
     // Verify that the response references the previous conversation
-    expect(response.data.main.toLowerCase()).toMatch(/color|colour/);
+    expect(finalResponse.data.main.toLowerCase()).toMatch(/color|colour/);
+    
+    // Check if the final response mentions any of the previously discussed colors
+    const previousColors = conversationHistory
+      .map(entry => entry.response)
+      .join(' ')
+      .toLowerCase();
+    
+    console.log('\nPrevious colors mentioned:', previousColors);
+    
+    // Verify that the final response contains at least one color from the previous conversation
+    const finalResponseText = finalResponse.data.main.toLowerCase();
+    const containsPreviousColor = previousColors.split(' ').some(color => 
+      color && finalResponseText.includes(color)
+    );
+    
+    console.log('Final response contains previous colors:', containsPreviousColor);
+    expect(containsPreviousColor).toBe(true);
   }, 120000); // Increase timeout to 2 minutes for all prompts
 });
