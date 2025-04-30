@@ -60,6 +60,58 @@
       transition: transform 0.2s ease;
     }
 
+    .think-content {
+      background-color: #f4f5f7;
+      border-radius: 4px;
+      margin: 8px 0;
+      padding: 12px;
+      font-size: 0.9em;
+      line-height: 1.5;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .think-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 0;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #e1e1e1;
+    }
+
+    .think-header:hover {
+      background-color: #e8e9eb;
+    }
+
+    .think-toggle-icon {
+      width: 12px;
+      height: 12px;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .think-toggle-icon.expanded {
+      transform: rotate(90deg);
+    }
+
+    .think-toggle-text {
+      color: #4e5d6c;
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+
+    .think-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-in-out;
+      padding: 0 0 8px 0;
+    }
+
+    .think-body.expanded {
+      max-height: 500px;
+    }
+
     .message:hover {
       transform: scale(1.02);
     }
@@ -203,17 +255,67 @@
           body: JSON.stringify({ message }),
         });
         const data = await res.json();
-        addMessage('bot', data.reply);
+        addMessage('bot', data);
       } catch (err) {
         addMessage('bot', 'Error: Unable to reach server.');
       }
     });
 
-    function addMessage(role, text) {
-      const msgEl = document.createElement('div');
-      msgEl.classList.add('message', role);
-      msgEl.textContent = text;
-      chat.appendChild(msgEl);
+    function addMessage(role, content) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${role}`;
+      
+      // If this is a bot message with think content
+      if (role === 'bot' && content.think && content.think.length > 0) {
+        // Create think container first
+        const thinkContainer = document.createElement('div');
+        thinkContainer.className = 'think-content';
+        
+        // Create header with toggle
+        const header = document.createElement('div');
+        header.className = 'think-header';
+        
+        // Create toggle icon
+        const toggleIcon = document.createElement('div');
+        toggleIcon.className = 'think-toggle-icon';
+        toggleIcon.innerHTML = '▶';
+        
+        // Create toggle text
+        const toggleText = document.createElement('span');
+        toggleText.className = 'think-toggle-text';
+        toggleText.textContent = 'Thinking process';
+        
+        // Add icon and text to header
+        header.appendChild(toggleIcon);
+        header.appendChild(toggleText);
+        
+        // Create body for think content
+        const body = document.createElement('div');
+        body.className = 'think-body';
+        body.innerHTML = content.think.join('<br>');
+        
+        // Add event listener to header
+        header.onclick = () => {
+          body.classList.toggle('expanded');
+          toggleIcon.classList.toggle('expanded');
+        };
+        
+        // Add header and body to think container
+        thinkContainer.appendChild(header);
+        thinkContainer.appendChild(body);
+        
+        // Add main content
+        messageDiv.innerHTML = content.main;
+        
+        // Add elements in reverse order (think content first)
+        chat.appendChild(thinkContainer);
+        chat.appendChild(messageDiv);
+      } else {
+        // Regular message
+        messageDiv.textContent = content;
+        chat.appendChild(messageDiv);
+      }
+      
       chat.scrollTop = chat.scrollHeight;
     }
   </script>

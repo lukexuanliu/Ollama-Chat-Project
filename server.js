@@ -28,7 +28,29 @@ app.post('/api/chat', async (req, res) => {
     }
     const data = await ollamaRes.json();
     const reply = data.choices?.[0]?.message?.content || '';
-    res.json({ reply });
+    
+    // Parse the response to separate think content
+    const mainContent = [];
+    const thinkContent = [];
+    
+    // Split by <think> tags
+    const parts = reply.split(/<think>([\s\S]*?)<\/think>/);
+    
+    // Separate main and think content
+    parts.forEach((part, index) => {
+      if (index % 2 === 0) {
+        // Even index: main content
+        mainContent.push(part);
+      } else {
+        // Odd index: think content
+        thinkContent.push(part.trim());
+      }
+    });
+    
+    res.json({
+      main: mainContent.join('').trim(),
+      think: thinkContent
+    });
   } catch (error) {
     console.error('Error in /api/chat:', error);
     res.status(500).json({ error: 'Error communicating with Ollama', details: error.message });
