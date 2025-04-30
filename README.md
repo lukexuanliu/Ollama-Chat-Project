@@ -1,6 +1,6 @@
 # Ollama Chat App
 
-A simple no-frills chat application using Ollama's **qwen3:0.6b** model, built using Ollama installed locally on a Mac laptop. This represents the first local Ollama installation and usage on this machine, showcasing the power of running LLMs locally without cloud dependencies.
+A simple no-frills chat application using Ollama's **qwen3:0.6b** model, built using Ollama installed locally on a Mac laptop. This represents the first local Ollama installation and usage on this machine, different from running huggingface models on the cloud.
 
 ## Local Setup
 
